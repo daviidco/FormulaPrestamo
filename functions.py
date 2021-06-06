@@ -6,18 +6,24 @@ def do_validation(self, new_value):
 
 
 def validate_like_currency(self, event):
-    if event.char.isnumeric() or event.keycode == 8 or event.keycode == 46:
+    if event.char.isnumeric() or event.keycode == 8 or event.keycode == 46  \
+            or event.keycode == 17 or event.keycode == 20 or event.keycode == 38 or event.keycode == 40 :
         value = self.txtValCredit.get()
         if value != "":
             value = format_currency(value, "", 0, True)
         self.valTextValCredit.set(value)
-        # self.txtValCredit.icursor(self.valTextValCredit.icur)
         if not (event.keycode == 8 or event.keycode == 46) and self.txtValCredit.index(tk.INSERT) == len(
                 self.txtValCredit.get()) - 1:
             self.txtValCredit.icursor(tk.END)
+
+    elif event.keycode == 37 or event.keycode == 39:
+        pass
     else:
         value = self.txtValCredit.get()
-        self.valTextValCredit.set(value[:-1])
+        novalidcharacter = re.search(r"[a-zA-Z;]", value).group()
+        idx = value.index(novalidcharacter)
+        self.txtValCredit.icursor(self.txtValCredit.index(tk.INSERT)-1)
+        self.valTextValCredit.set(value[:idx] + value[idx+1:])
 
 
 def clean_form(self, listframes):
