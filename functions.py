@@ -30,10 +30,10 @@ def clean_form(self, listframes):
     try:
         print("Limpiando inputs...")
 
-        WIDGET_CLASSNAME = 'Entry'
+        WIDGET_CLASSNAME = ['Entry', 'TEntry']
         for objframe in listframes:
             selection_form = [child for child in objframe.winfo_children()
-                              if child.winfo_class() == WIDGET_CLASSNAME]
+                              if child.winfo_class() in WIDGET_CLASSNAME]
 
             for widget in selection_form:
                 actual_state = widget['state']
