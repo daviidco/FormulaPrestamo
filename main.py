@@ -1,12 +1,11 @@
-import functools
 import tkinter as tk
 import functions as myfns
 
 from tkinter import ttk
-from Prestamo import Prestamo
+from Credit import Credit
 
 
-class app:
+class App:
     def __init__(self, master):
         self.master = master
         # DC - Titulo barra principal
@@ -22,7 +21,7 @@ class app:
         self.master.bind('<Return>', lambda event=None: self.btnCalculate.invoke())
 
     def put_frames(self):
-        # DC - Frames o Paneles
+        # Frames or panels
         self.frame_title = tk.Frame(self.master, bg="green", height=40)
         self.frame_form = tk.Frame(self.master)
         self.frame_result = tk.Frame(self.frame_form)
@@ -33,9 +32,9 @@ class app:
         self.frame_result.grid_forget()
 
     def put_title(self):
-        lbl_Title = tk.Label(self.frame_title, text="Formulas de Prestamos", bg="green", foreground="white",
+        lbl_title = tk.Label(self.frame_title, text="Formulas de Prestamos", bg="green", foreground="white",
                              font="white")
-        lbl_Title.pack(expand=True)
+        lbl_title.pack(expand=True)
 
     def add_dots(self, action, text_val, P, old_text, index):
         P = P.replace('.', '')  # quitamos los puntos, nos quedamos solo con los dígitos
@@ -72,26 +71,6 @@ class app:
         else:
             return False
 
-    def validate_float(self, value_if_allowed):
-        if value_if_allowed:
-            try:
-                float(value_if_allowed)
-                return True
-            except ValueError:
-                return False
-        else:
-            return True
-
-    def validate_int(self, value_if_allowed):
-        if value_if_allowed:
-            try:
-                int(value_if_allowed)
-                return True
-            except ValueError:
-                return False
-        else:
-            return True
-
     def put_form(self):
         self.lblValCredit = tk.Label(self.frame_form, text="Valor del crédito $:")
         self.valTextValCredit = tk.StringVar()
@@ -100,23 +79,22 @@ class app:
                                       validatecommand=vcmd)
         self.lblValCredit.grid(pady=15, row=1, column=0, sticky="W")
         self.txtValCredit.grid(pady=15, row=1, column=1)
-        # self.txtValCredit.bind("<KeyRelease>", functools.partial(myfns.validate_like_currency, self))#validate_like_currency(app))
 
         self.lblInterest = tk.Label(self.frame_form, text="Tasa de interes (%):")
-        vcmd_float = (self.frame_form.register(self.validate_float), '%P')
+        vcmd_float = (self.frame_form.register(myfns.validate_float), '%P')
         self.txtInterest = tk.Entry(self.frame_form, font="15", validate='key', validatecommand=vcmd_float)
         self.lblInterest.grid(pady=15, row=2, column=0, sticky="W")
         self.txtInterest.grid(pady=15, row=2, column=1)
 
         lblNumCuotas = tk.Label(self.frame_form, text="Num de cuotas (meses):")
-        vcmd_int = (self.frame_form.register(self.validate_int), '%P')
+        vcmd_int = (self.frame_form.register(myfns.validate_int), '%P')
         self.txtNumCuotas = tk.Entry(self.frame_form, font="15", validate='key', validatecommand=vcmd_int)
         lblNumCuotas.grid(pady=15, row=3, column=0, sticky="W")
         self.txtNumCuotas.grid(pady=15, row=3, column=1)
 
         self.btnCalculate = tk.Button(self.frame_form, text="Calcular", bg="green", fg="white", command=self.calculate)
         self.btnLimpiar = tk.Button(self.frame_form, text="Limpiar", bg="orange",
-                                    command=lambda: myfns.clean_form(self, [self.frame_form, self.frame_result]))
+                                    command=lambda: myfns.clean_form([self.frame_form, self.frame_result]))
         self.btnLimpiar.grid(pady=15, row=4, column=0, sticky="W")
         self.btnCalculate.grid(pady=15, row=4, column=1, sticky="NSEW")
 
@@ -144,19 +122,19 @@ class app:
 
             # DC - Limpia valores de resultados
             # self.clean_results()
-            myfns.clean_form(self, [self.frame_result])
-            myfns.change_state_entry_form(self, [self.frame_result], "normal")
+            myfns.clean_form([self.frame_result])
+            myfns.change_state_entry_form([self.frame_result], "normal")
 
             cant_prestamo = int(self.txtValCredit.get().replace(".", "").replace(",", ""))
             num_cuotas = int(self.txtNumCuotas.get())
             interes = float(self.txtInterest.get()) / 100
 
             # DC - Crea objeto Prestamo
-            prestamo = Prestamo(cant_prestamo, num_cuotas, interes)
+            prestamo = Credit(cant_prestamo, num_cuotas, interes)
 
-            self.txtPlazo.insert(0, prestamo.numcuotas)
-            self.txtCuota.insert(0, myfns.format_currency(prestamo.valCuota))
-            self.txtCostoFinanciacion.insert(0, myfns.format_currency(prestamo.costofinanciero))
+            self.txtPlazo.insert(0, prestamo.num_payments)
+            self.txtCuota.insert(0, myfns.format_currency(prestamo.payment))
+            self.txtCostoFinanciacion.insert(0, myfns.format_currency(prestamo.financial_cost))
 
         except Exception as e:
             self.txtPlazo.insert(0, 'ERROR')
@@ -164,10 +142,10 @@ class app:
 
             self.txtCostoFinanciacion.insert(0, 'ERROR')
         else:
-            myfns.change_state_entry_form(self, [self.frame_result], "readonly")
+            myfns.change_state_entry_form([self.frame_result], "readonly")
 
 
 root = tk.Tk()
-main_gui = app(root)
+main_gui = App(root)
 
 root.mainloop()
